@@ -1,8 +1,10 @@
-# extract_llm – LLM 포렌식 아티팩트 추출 도구
+# extract_llm – LLM 포렌식 아티팩트 추출용 자동화 스크립트
 
-E01 디스크 이미지에서 **LLM 애플리케이션(ChatGPT, Claude, LM Studio, Jan, 미정의 LLM 등)**의
+E01 디스크 이미지에서 **LLM 애플리케이션(ChatGPT, Claude, LM Studio, Jan, 미정의 LLM 등**의
 **실행 흔적 / 사용자 정보 / 프롬프트 / 파일 업로드 / 네트워크 아티팩트**를 자동으로 수집하여
-결과 폴더로 정리합니다. dfVFS를 통해 E01 이미지를 읽고, 앱별 **경로 패턴(artifacts.json)** 또는
+결과 폴더로 정리합니다. 
+
+dfVFS를 통해 E01 이미지를 읽고, 앱별 **경로 패턴(artifacts.json)** 또는
 **휴리스틱 패턴**을 재귀적으로 탐색합니다.
 
 ---
