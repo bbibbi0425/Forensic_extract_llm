@@ -49,8 +49,8 @@ dfVFS를 통해 E01 이미지를 읽고, 앱별 **경로 패턴(artifacts.json)*
 
 ### 1) 리포지토리 클론
 ```bash
-git clone https://github.com/forensicbread/WHS_tool.git
-cd WHS_tool
+git clone https://github.com/forensicbread/WHS_extract_llm.git
+cd WHS_extract_llm
 ```
 
 ### 2) Windows(WSL‑Ubuntu) – 방법 A: 자동 설치 스크립트
@@ -60,7 +60,7 @@ wsl --install -d Ubuntu
 # 재부팅 후 WSL(“Ubuntu”) 실행
 
 # (WSL) 리포지토리로 이동
-cd "<YOUR_PATH_TO_WHS_tool>"
+cd "<YOUR_PATH_TO_WHS_extract_llm>"
 
 # (WSL) 스크립트 권한 및 실행
 chmod +x setup_wsl.sh
@@ -71,8 +71,8 @@ source ~/venvs/whs-windows/bin/activate
 
 # (WSL) 실행 예시
 python -m extract_llm ./E01/CLAUDE.E01 api CLAUDE ./result
-# 또는 상세 모드
-python extract_llm.py ./E01/CLAUDE.E01 api CLAUDE ./result
+# 또는
+python ./extract_llm/cli.py ./E01/CLAUDE.E01 api CLAUDE ./result
 ```
 
 ### 3) Windows(WSL‑Ubuntu) – 방법 B: 수동 설치
@@ -92,13 +92,13 @@ pip install -r requirements.txt
 
 # (WSL) 실행 예시
 python -m extract_llm ./E01/CLAUDE.E01 api CLAUDE ./result
-# 또는 상세 모드
-python extract_llm.py ./E01/CLAUDE.E01 api CLAUDE ./result
+# 또는
+python ./extract_llm/cli.py ./E01/CLAUDE.E01 api CLAUDE ./result
 ```
 
 ### 4) macOS: 자동 설치 스크립트
 ```bash
-cd "<YOUR_PATH_TO_WHS_tool>"
+cd "<YOUR_PATH_TO_WHS_extract_llm>"
 chmod +x setup_macos.sh
 ./setup_macos.sh
 
@@ -107,8 +107,8 @@ source .venv-macos/bin/activate
 
 # 실행 예시
 python -m extract_llm ./E01/CLAUDE.E01 api CLAUDE ./result
-# 또는 상세 모드
-python extract_llm.py ./E01/CLAUDE.E01 api CLAUDE ./result
+# 또는
+python ./extract_llm/cli.py ./E01/CLAUDE.E01 api CLAUDE ./result
 ```
 
 ---
@@ -116,7 +116,7 @@ python extract_llm.py ./E01/CLAUDE.E01 api CLAUDE ./result
 ## 명령줄 사용법(Usage)
 
 ```bash
-python extract_llm.py <E01_IMAGE> <MODE> <LLM_NAME> <OUTPUT_DIR> [옵션]
+python -m extract_llm <E01_IMAGE> <MODE> <LLM_NAME> <OUTPUT_DIR> [옵션]
 ```
 
 - `MODE`: `api` | `standalone`
@@ -124,26 +124,28 @@ python extract_llm.py <E01_IMAGE> <MODE> <LLM_NAME> <OUTPUT_DIR> [옵션]
 - `OUTPUT_DIR`: 결과 저장 폴더(없으면 자동 생성)
 
 ### 옵션(Flags)
-- `-c, --color` : 컬러 출력 활성화
-- `-v, --verbose` : **상세 모드** 활성화(헤더/요약/테이블 표시, 암묵적으로 `--color` 포함)
-- `-p, --no-keep-plus` : 카테고리 폴더명에서 `+`를 `_`로 치환
-- `-s, --no-final-summary` : 마지막 **요약 메시지** 출력 생략
-
-> 과거 문서의 `--no-show-summary` 옵션은 제거되었으며, 현재는 `-s/--no-final-summary`로 통일되었습니다.
+- `-c, --color` : 컬러 출력
+- `-v, --verbose` : 상세 모드(헤더/카테고리 요약/최종 테이블)
+- `--hash` : **소스 E01 이미지 SHA-256 계산 및 로그 기록(기본 미계산)**
+- `-p, --no-keep-plus` : 카테고리 폴더명에서 `+` → `_` 치환
+- `-s, --no-final-summary` : 마지막 요약 메시지 생략
 
 #### 예시(Examples)
 ```bash
 # 최소 출력
-python extract_llm.py ./E01/CHATGPT.E01 api CHATGPT ./result
+python -m extract_llm ./E01/CHATGPT.E01 api CHATGPT ./result
 
 # 컬러 활성화
-python extract_llm.py ./E01/CHATGPT.E01 api CHATGPT ./result -c
+python -m extract_llm ./E01/CHATGPT.E01 api CHATGPT ./result -c
 
 # 상세 모드(헤더/요약/테이블)
-python extract_llm.py ./E01/CLAUDE.E01 api CLAUDE ./result -v
+python -m extract_llm ./E01/CLAUDE.E01 api CLAUDE ./result -v
+
+# SHA-256 계산 및 로그 기록
+python -m extract_llm ./E01/CLAUDE.E01 api CLAUDE ./result -hash
 
 # 카테고리명에서 '+'를 '_'로 치환
-python extract_llm.py ./E01/LMSTUDIO.E01 standalone LMSTUDIO ./result -p
+python -m extract_llm ./E01/LMSTUDIO.E01 standalone LMSTUDIO ./result -p
 ```
 
 ---
@@ -152,7 +154,7 @@ python extract_llm.py ./E01/LMSTUDIO.E01 standalone LMSTUDIO ./result -p
 
 - `./result/<LLM_NAME>/<카테고리>/...` : 추출된 파일/디렉터리
 - `./result/<LLM_NAME>/extraction_report.txt` : 실행 컨텍스트 + **상세 경로/에러 로그**
-  - 이미지 파일명/경로, **SHA‑256**, LLM 타깃/모드, 명령줄, 타임스탬프
+  - 이미지 파일명/경로, **SHA‑256**(선택), LLM 타깃/모드, 명령줄, 타임스탬프
   - 카테고리별 성공/실패 카운트, 전체 소요 시간
 
 ### 요약 테이블(Verbose 모드)
